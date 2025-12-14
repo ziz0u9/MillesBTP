@@ -25,7 +25,8 @@ function Router() {
       <Route path="/auth/register" component={Register} />
       
       {/* Dashboard Routes wrapped in Layout */}
-      <Route path="/dashboard*">
+      {/* Using a wildcard route to match all dashboard paths */}
+      <Route path="/dashboard/:rest*">
         <Layout>
           <Switch>
             <Route path="/dashboard" component={Dashboard} />
@@ -36,10 +37,13 @@ function Router() {
             <Route path="/dashboard/tasks" component={Tasks} />
             <Route path="/dashboard/clients" component={Clients} />
             <Route path="/dashboard/settings" component={Settings} />
+            {/* Fallback for unknown dashboard routes */}
+            <Route component={NotFound} />
           </Switch>
         </Layout>
       </Route>
       
+      {/* Global Fallback */}
       <Route component={NotFound} />
     </Switch>
   );
