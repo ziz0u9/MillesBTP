@@ -1,0 +1,94 @@
+Tu es un expert en design SaaS, UX/UI et génération d’applications web complètes.
+
+Objectif :
+Générer la première ébauche fonctionnelle et visuelle d’un SaaS nommé **MillesBTP**, destiné aux entreprises du BTP, avec une navigation complète, un design moderne et des textes prêts à l’emploi.
+
+Références design :
+- Design inspiré du dashboard SaaS moderne sombre fourni en référence (dark mode, cartes avec statistiques, graphiques, sidebar verticale).
+- Style : professionnel, premium, clair, orienté productivité.
+- Palette sombre avec accents violets / bleus.
+- UI moderne (cards, graphiques, tableaux, sidebar, topbar).
+
+Architecture globale attendue :
+- Application web SaaS responsive
+- Navigation latérale (sidebar) persistante
+- Topbar avec recherche, notifications, profil utilisateur
+- Connexion à une base de données (structure prévue, même si mockée)
+
+Pages à générer :
+
+1. Page d’accueil (Landing Page)
+   - Présentation claire de MillesBTP
+   - Proposition de valeur : assistance administrative et gestion pour entreprises BTP
+   - Sections :
+     - Hero section (titre, sous-titre, CTA)
+     - Fonctionnalités principales
+     - Bénéfices pour les artisans / PME BTP
+     - Aperçu du dashboard
+     - Call-to-action (Créer un compte / Se connecter)
+
+2. Authentification
+   - Page de connexion
+   - Page d’inscription
+   - Lien mot de passe oublié
+
+3. Dashboard principal
+   - Vue d’ensemble avec :
+     - Cartes de statistiques (appels traités, mails en attente, factures, commandes, tâches)
+     - Graphiques d’activité
+     - Tableau récapitulatif des dernières actions
+   - Données fictives mais réalistes
+
+4. Espace client / Profil utilisateur
+   - Informations client (entreprise, contact, email, téléphone)
+   - Paramètres du compte
+   - Historique des actions
+   - Connexion à une base de données (structure utilisateurs / entreprises)
+
+5. Onglets / modules (vides mais structurés et prêts à être remplis) :
+   Chaque module doit avoir :
+   - Une page dédiée
+   - Un layout cohérent
+   - Un tableau principal
+   - Des boutons d’action (ajouter, modifier, supprimer)
+
+   Modules à inclure :
+   - Accueil téléphonique
+     - Suivi des appels
+     - Statuts (reçu, traité, en attente)
+   - Gestion des mails
+     - Boîte de réception
+     - Statuts des mails
+   - Facturation
+     - Devis
+     - Factures
+     - Paiements
+   - Suivi des commandes
+     - Liste des commandes
+     - Statuts
+   - Tâches administratives & comptables
+     - Classement
+     - Archivage
+     - Tâches à faire
+
+Contraintes techniques et UX :
+- Structure claire et évolutive
+- Nommage cohérent des composants
+- Textes en français
+- UX orientée simplicité et efficacité
+- Prévoir une base de données avec :
+  - Utilisateurs
+  - Entreprises
+  - Appels
+  - Emails
+  - Factures
+  - Commandes
+  - Tâches
+
+Livrable attendu :
+- Application SaaS fonctionnelle en première ébauche
+- Navigation complète
+- Design abouti
+- Textes réalistes
+- Données fictives
+- Structure prête à être enrichie par la suite
