@@ -1,8 +1,21 @@
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, ShoppingCart, Truck, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { Search, ShoppingCart, Truck, CheckCircle, Clock, AlertCircle, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { useLogs } from "@/lib/LogContext";
 
 const orders = [
   { id: "CMD-9921", supplier: "Point P", items: "Planches de chêne (x50), Vis (x200)", amount: "850.00€", status: "delivered", date: "12/05/2024" },
@@ -12,6 +25,20 @@ const orders = [
 ];
 
 export default function Orders() {
+  const [open, setOpen] = useState(false);
+  const { toast } = useToast();
+  const { addLog } = useLogs();
+
+  const handleCreateOrder = (e: React.FormEvent) => {
+    e.preventDefault();
+    setOpen(false);
+    toast({
+      title: "Commande créée",
+      description: "Votre commande fournisseur a été enregistrée.",
+    });
+    addLog("Nouvelle Commande", "Commande fournisseur créée");
+  };
+
   const getStatusIcon = (status: string) => {
     switch(status) {
       case "delivered": return <CheckCircle className="h-5 w-5 text-green-500" />;
@@ -39,10 +66,46 @@ export default function Orders() {
           <h2 className="text-2xl font-heading font-bold tracking-tight">Suivi des commandes</h2>
           <p className="text-muted-foreground">Suivez vos approvisionnements et livraisons fournisseurs.</p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90 text-white">
-          <ShoppingCart className="mr-2 h-4 w-4" />
-          Nouvelle commande
-        </Button>
+        
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-primary hover:bg-primary/90 text-white">
+              <ShoppingCart className="mr-2 h-4 w-4" />
+              Nouvelle commande
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Nouvelle commande</DialogTitle>
+              <DialogDescription>
+                Enregistrer une commande fournisseur.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleCreateOrder} className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="supplier" className="text-right">
+                  Fournisseur
+                </Label>
+                <Input id="supplier" placeholder="Nom du fournisseur" className="col-span-3" required />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="items" className="text-right">
+                  Matériaux
+                </Label>
+                <Input id="items" placeholder="Liste des matériaux" className="col-span-3" required />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="amount" className="text-right">
+                  Montant
+                </Label>
+                <Input id="amount" placeholder="0.00€" className="col-span-3" required />
+              </div>
+              <DialogFooter>
+                <Button type="submit">Valider</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="flex items-center gap-4 bg-card/50 p-4 rounded-lg border border-white/5">
@@ -82,8 +145,11 @@ export default function Orders() {
           </Card>
         ))}
         
-        {/* Add new card placeholder */}
-        <button className="flex flex-col items-center justify-center p-6 rounded-xl border border-dashed border-white/10 bg-white/5 hover:bg-white/10 transition-colors h-full min-h-[180px]">
+        {/* Add new card placeholder that also opens dialog */}
+        <button 
+          onClick={() => setOpen(true)}
+          className="flex flex-col items-center justify-center p-6 rounded-xl border border-dashed border-white/10 bg-white/5 hover:bg-white/10 transition-colors h-full min-h-[180px]"
+        >
           <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
             <ShoppingCart className="h-6 w-6" />
           </div>

@@ -17,16 +17,11 @@ import {
   Mail,
   Smartphone
 } from "lucide-react";
-
-const activityLog = [
-  { id: 1, action: "Connexion", detail: "Connexion réussie depuis Chrome / Windows", date: "Aujourd'hui, 08:30", ip: "192.168.1.1" },
-  { id: 2, action: "Création Facture", detail: "Facture #FAC-2024-004 créée pour RénovPlus", date: "Hier, 16:45", ip: "192.168.1.1" },
-  { id: 3, action: "Modification Client", detail: "Mise à jour adresse M. Dubois", date: "Hier, 14:20", ip: "192.168.1.1" },
-  { id: 4, action: "Export", detail: "Export comptable Mai 2024", date: "12/05/2024, 09:15", ip: "192.168.1.1" },
-  { id: 5, action: "Mot de passe", detail: "Modification du mot de passe", date: "10/05/2024, 18:00", ip: "192.168.1.1" },
-];
+import { useLogs } from "@/lib/LogContext";
 
 export default function Settings() {
+  const { logs } = useLogs();
+
   return (
     <div className="space-y-6">
       <div>
@@ -193,7 +188,7 @@ export default function Settings() {
               <CardContent>
                 <ScrollArea className="h-[400px] pr-4">
                   <div className="space-y-8">
-                    {activityLog.map((log) => (
+                    {logs.map((log) => (
                       <div key={log.id} className="flex items-start">
                         <div className="mt-1 mr-4 flex-shrink-0">
                           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 border border-primary/20 text-primary">

@@ -17,6 +17,19 @@ import {
   Forward
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { useLogs } from "@/lib/LogContext";
 
 const mails = [
   {
@@ -68,14 +81,62 @@ const mails = [
 export default function Mails() {
   const [selectedMail, setSelectedMail] = useState(mails[0]);
   const [activeTab, setActiveTab] = useState("inbox");
+  const [open, setOpen] = useState(false);
+  const { toast } = useToast();
+  const { addLog } = useLogs();
+
+  const handleSendMail = (e: React.FormEvent) => {
+    e.preventDefault();
+    setOpen(false);
+    toast({
+      title: "Email envoyé",
+      description: "Votre message a bien été expédié.",
+    });
+    addLog("Envoi Email", "Nouveau message envoyé");
+  };
 
   return (
     <div className="h-[calc(100vh-120px)] flex flex-col md:flex-row gap-6">
       {/* Sidebar */}
       <div className="w-full md:w-64 flex-shrink-0 space-y-4">
-        <Button className="w-full justify-start gap-2 bg-primary text-white hover:bg-primary/90">
-          <Mail className="h-4 w-4" /> Nouveau message
-        </Button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button className="w-full justify-start gap-2 bg-primary text-white hover:bg-primary/90">
+              <Mail className="h-4 w-4" /> Nouveau message
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Nouveau message</DialogTitle>
+              <DialogDescription>
+                Rédigez votre email à envoyer.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleSendMail} className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="to" className="text-right">
+                  À
+                </Label>
+                <Input id="to" placeholder="destinataire@email.com" className="col-span-3" required />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="subject" className="text-right">
+                  Sujet
+                </Label>
+                <Input id="subject" placeholder="Sujet du message" className="col-span-3" required />
+              </div>
+              <div className="grid grid-cols-4 gap-4">
+                <Label htmlFor="message" className="text-right mt-2">
+                  Message
+                </Label>
+                <Textarea id="message" placeholder="Votre message..." className="col-span-3 h-32" required />
+              </div>
+              <DialogFooter>
+                <Button type="submit">Envoyer</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
 
         <nav className="space-y-1">
           {[

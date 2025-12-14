@@ -14,6 +14,18 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { useLogs } from "@/lib/LogContext";
 
 const initialTasks = [
   { id: 1, title: "Envoyer devis M. Martin", due: new Date(2024, 5, 15), completed: false, tag: "Devis" },
@@ -25,9 +37,22 @@ const initialTasks = [
 export default function Tasks() {
   const [tasks, setTasks] = useState(initialTasks);
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [open, setOpen] = useState(false);
+  const { toast } = useToast();
+  const { addLog } = useLogs();
 
   const toggleTask = (id: number) => {
     setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+  };
+
+  const handleCreateTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    setOpen(false);
+    toast({
+      title: "Tâche ajoutée",
+      description: "Votre nouvelle tâche a été créée.",
+    });
+    addLog("Nouvelle Tâche", "Tâche ajoutée à la liste");
   };
 
   return (
@@ -37,10 +62,44 @@ export default function Tasks() {
           <h2 className="text-2xl font-heading font-bold tracking-tight">Tâches</h2>
           <p className="text-muted-foreground">Votre liste de choses à faire.</p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90 text-white">
-          <Plus className="mr-2 h-4 w-4" />
-          Nouvelle tâche
-        </Button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-primary hover:bg-primary/90 text-white">
+              <Plus className="mr-2 h-4 w-4" />
+              Nouvelle tâche
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Nouvelle tâche</DialogTitle>
+              <DialogDescription>
+                Ajouter une tâche à votre liste.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleCreateTask} className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="task" className="text-right">
+                  Tâche
+                </Label>
+                <Input id="task" placeholder="Description de la tâche" className="col-span-3" required />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="category" className="text-right">
+                  Catégorie
+                </Label>
+                <select id="category" className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                  <option>Admin</option>
+                  <option>Chantier</option>
+                  <option>Devis</option>
+                  <option>Compta</option>
+                </select>
+              </div>
+              <DialogFooter>
+                <Button type="submit">Ajouter</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">

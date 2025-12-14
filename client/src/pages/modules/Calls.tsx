@@ -19,6 +19,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { useLogs } from "@/lib/LogContext";
 
 const initialCalls = [
   { id: 1, type: "incoming", contact: "M. Martin", phone: "06 12 34 56 78", date: "Auj. 10:30", status: "missed", subject: "Urgence fuite d'eau" },
@@ -29,7 +41,20 @@ const initialCalls = [
 ];
 
 export default function Calls() {
-  const [calls] = useState(initialCalls);
+  const [calls, setCalls] = useState(initialCalls);
+  const [open, setOpen] = useState(false);
+  const { toast } = useToast();
+  const { addLog } = useLogs();
+
+  const handleCreateCall = (e: React.FormEvent) => {
+    e.preventDefault();
+    setOpen(false);
+    toast({
+      title: "Appel enregistré",
+      description: "Le nouvel appel a été ajouté à la liste.",
+    });
+    addLog("Nouvel Appel", "Appel enregistré manuellement");
+  };
 
   const getStatusBadge = (status: string) => {
     switch(status) {
@@ -56,10 +81,46 @@ export default function Calls() {
           <h2 className="text-2xl font-heading font-bold tracking-tight">Suivi des appels</h2>
           <p className="text-muted-foreground">Gérez votre standard téléphonique et ne ratez aucune opportunité.</p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90 text-white">
-          <Plus className="mr-2 h-4 w-4" />
-          Nouvel appel
-        </Button>
+        
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-primary hover:bg-primary/90 text-white">
+              <Plus className="mr-2 h-4 w-4" />
+              Nouvel appel
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Enregistrer un appel</DialogTitle>
+              <DialogDescription>
+                Créez une fiche pour un appel entrant ou sortant.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleCreateCall} className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="contact" className="text-right">
+                  Contact
+                </Label>
+                <Input id="contact" placeholder="Nom du contact" className="col-span-3" required />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="phone" className="text-right">
+                  Téléphone
+                </Label>
+                <Input id="phone" placeholder="06..." className="col-span-3" required />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="subject" className="text-right">
+                  Sujet
+                </Label>
+                <Input id="subject" placeholder="Objet de l'appel" className="col-span-3" required />
+              </div>
+              <DialogFooter>
+                <Button type="submit">Enregistrer</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="flex items-center gap-4 bg-card/50 p-4 rounded-lg border border-white/5">
@@ -114,7 +175,12 @@ export default function Calls() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem>Rappeler</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => {
+                        toast({ title: "Appel", description: "Rappel programmé" });
+                        addLog("Rappel programmé", `Pour ${call.contact}`);
+                      }}>
+                        Rappeler
+                      </DropdownMenuItem>
                       <DropdownMenuItem>Marquer comme traité</DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem>Créer un contact</DropdownMenuItem>

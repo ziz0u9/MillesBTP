@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Table, 
   TableBody, 
@@ -29,6 +29,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { useLogs } from "@/lib/LogContext";
 
 const initialClients = [
   { 
@@ -79,6 +91,19 @@ const initialClients = [
 
 export default function Clients() {
   const [clients] = useState(initialClients);
+  const [open, setOpen] = useState(false);
+  const { toast } = useToast();
+  const { addLog } = useLogs();
+
+  const handleCreateClient = (e: React.FormEvent) => {
+    e.preventDefault();
+    setOpen(false);
+    toast({
+      title: "Client ajouté",
+      description: "Le nouveau client a été enregistré.",
+    });
+    addLog("Nouveau Client", "Fiche client créée");
+  };
 
   return (
     <div className="space-y-6">
@@ -87,10 +112,45 @@ export default function Clients() {
           <h2 className="text-2xl font-heading font-bold tracking-tight">Fichier Clients</h2>
           <p className="text-muted-foreground">Gérez vos contacts professionnels et particuliers.</p>
         </div>
-        <Button className="bg-primary hover:bg-primary/90 text-white">
-          <Plus className="mr-2 h-4 w-4" />
-          Nouveau client
-        </Button>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-primary hover:bg-primary/90 text-white">
+              <Plus className="mr-2 h-4 w-4" />
+              Nouveau client
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Nouveau client</DialogTitle>
+              <DialogDescription>
+                Ajouter une entreprise ou un particulier.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleCreateClient} className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  Nom
+                </Label>
+                <Input id="name" placeholder="Nom du client" className="col-span-3" required />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="email" className="text-right">
+                  Email
+                </Label>
+                <Input id="email" placeholder="email@exemple.com" className="col-span-3" required />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="phone" className="text-right">
+                  Téléphone
+                </Label>
+                <Input id="phone" placeholder="06..." className="col-span-3" required />
+              </div>
+              <DialogFooter>
+                <Button type="submit">Enregistrer</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="flex items-center gap-4 bg-card/50 p-4 rounded-lg border border-white/5">
