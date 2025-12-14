@@ -20,26 +20,50 @@ import Settings from "@/pages/modules/Settings";
 function Router() {
   return (
     <Switch>
+      {/* Public Routes */}
       <Route path="/" component={LandingPage} />
       <Route path="/auth/login" component={Login} />
       <Route path="/auth/register" component={Register} />
       
-      {/* Dashboard Routes wrapped in Layout */}
-      {/* Using a wildcard route to match all dashboard paths */}
-      <Route path="/dashboard/:rest*">
+      {/* Dashboard Routes - Explicitly defined to ensure reliable matching */}
+      <Route path="/dashboard">
         <Layout>
-          <Switch>
-            <Route path="/dashboard" component={Dashboard} />
-            <Route path="/dashboard/calls" component={Calls} />
-            <Route path="/dashboard/mails" component={Mails} />
-            <Route path="/dashboard/invoices" component={Invoices} />
-            <Route path="/dashboard/orders" component={Orders} />
-            <Route path="/dashboard/tasks" component={Tasks} />
-            <Route path="/dashboard/clients" component={Clients} />
-            <Route path="/dashboard/settings" component={Settings} />
-            {/* Fallback for unknown dashboard routes */}
-            <Route component={NotFound} />
-          </Switch>
+          <Dashboard />
+        </Layout>
+      </Route>
+      <Route path="/dashboard/calls">
+        <Layout>
+          <Calls />
+        </Layout>
+      </Route>
+      <Route path="/dashboard/mails">
+        <Layout>
+          <Mails />
+        </Layout>
+      </Route>
+      <Route path="/dashboard/invoices">
+        <Layout>
+          <Invoices />
+        </Layout>
+      </Route>
+      <Route path="/dashboard/orders">
+        <Layout>
+          <Orders />
+        </Layout>
+      </Route>
+      <Route path="/dashboard/tasks">
+        <Layout>
+          <Tasks />
+        </Layout>
+      </Route>
+      <Route path="/dashboard/clients">
+        <Layout>
+          <Clients />
+        </Layout>
+      </Route>
+      <Route path="/dashboard/settings">
+        <Layout>
+          <Settings />
         </Layout>
       </Route>
       
