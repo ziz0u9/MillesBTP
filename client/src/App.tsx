@@ -13,19 +13,8 @@ import Mails from "@/pages/modules/Mails";
 import Invoices from "@/pages/modules/Invoices";
 import Orders from "@/pages/modules/Orders";
 import Tasks from "@/pages/modules/Tasks";
-
-// Simple placeholder for other modules to avoid errors before they are built
-const PlaceholderModule = ({ title }: { title: string }) => (
-  <div className="flex flex-col items-center justify-center h-[60vh] text-center space-y-4">
-    <div className="p-4 rounded-full bg-primary/10 text-primary">
-      <span className="text-2xl font-bold">{title.charAt(0)}</span>
-    </div>
-    <h2 className="text-2xl font-bold">{title}</h2>
-    <p className="text-muted-foreground max-w-md">
-      Ce module est en cours de développement. Il sera disponible dans la prochaine version.
-    </p>
-  </div>
-);
+import Clients from "@/pages/modules/Clients";
+import Settings from "@/pages/modules/Settings";
 
 function Router() {
   return (
@@ -44,12 +33,8 @@ function Router() {
             <Route path="/dashboard/invoices" component={Invoices} />
             <Route path="/dashboard/orders" component={Orders} />
             <Route path="/dashboard/tasks" component={Tasks} />
-            <Route path="/dashboard/clients">
-              <PlaceholderModule title="Fichier Clients" />
-            </Route>
-            <Route path="/dashboard/settings">
-              <PlaceholderModule title="Paramètres" />
-            </Route>
+            <Route path="/dashboard/clients" component={Clients} />
+            <Route path="/dashboard/settings" component={Settings} />
           </Switch>
         </Layout>
       </Route>
