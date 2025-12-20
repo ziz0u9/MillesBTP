@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
@@ -16,16 +16,33 @@ import Orders from "@/pages/modules/Orders";
 import Tasks from "@/pages/modules/Tasks";
 import Clients from "@/pages/modules/Clients";
 import Settings from "@/pages/modules/Settings";
+import { useEffect } from "react";
+import { useSession } from "@/hooks/useSession";
 
-function Router() {
+function RouterGuard() {
+  const { session, loading } = useSession();
+  const [location, setLocation] = useLocation();
+
+  // Protéger toutes les routes /dashboard si non authentifié
+  // Et rediriger les utilisateurs connectés qui tentent d'accéder à login/register
+  useEffect(() => {
+    if (!loading) {
+      if (!session && location.startsWith("/dashboard")) {
+        setLocation("/auth/login");
+      } else if (session && (location === "/auth/login" || location === "/auth/register")) {
+        // Si l'utilisateur est déjà connecté, rediriger vers le dashboard
+        setLocation("/dashboard");
+      }
+    }
+  }, [location, session, loading, setLocation]);
+
   return (
     <Switch>
       {/* Public Routes */}
       <Route path="/" component={LandingPage} />
       <Route path="/auth/login" component={Login} />
       <Route path="/auth/register" component={Register} />
-      
-      {/* Dashboard Routes - Explicitly defined to ensure reliable matching */}
+      {/* Dashboard Routes protégées */}
       <Route path="/dashboard">
         <Layout>
           <Dashboard />
@@ -66,8 +83,7 @@ function Router() {
           <Settings />
         </Layout>
       </Route>
-      
-      {/* Global Fallback */}
+      {/* Fallback */}
       <Route component={NotFound} />
     </Switch>
   );
@@ -77,7 +93,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <LogProvider>
-        <Router />
+        <RouterGuard />
         <Toaster />
       </LogProvider>
     </QueryClientProvider>

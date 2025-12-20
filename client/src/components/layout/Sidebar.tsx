@@ -8,7 +8,6 @@ import {
   CheckSquare, 
   Users, 
   Settings, 
-  LogOut,
   Building2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -86,9 +85,6 @@ export function Sidebar() {
             <p className="truncate text-sm font-medium text-white">Jean Dupont</p>
             <p className="truncate text-xs text-muted-foreground">Ent. Dupont BTP</p>
           </div>
-          <Link href="/">
-            <LogOut className="h-5 w-5 text-muted-foreground hover:text-white cursor-pointer transition-colors" />
-          </Link>
         </div>
       </div>
     </div>

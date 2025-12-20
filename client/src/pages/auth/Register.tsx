@@ -13,6 +13,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Building2 } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
+import { useState } from "react";
+import { useLogs } from "@/lib/LogContext";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Le nom est requis." }),
@@ -23,6 +26,9 @@ const formSchema = z.object({
 
 export default function Register() {
   const [, setLocation] = useLocation();
+  const [registerError, setRegisterError] = useState<string|null>(null);
+  const [registerSuccess, setRegisterSuccess] = useState<string|null>(null);
+  const { addLog } = useLogs();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -34,9 +40,44 @@ export default function Register() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    setLocation("/dashboard");
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setRegisterError(null);
+    setRegisterSuccess(null);
+    // Création du compte Supabase
+    const { data, error } = await supabase.auth.signUp({
+      email: values.email,
+      password: values.password,
+      options: {
+        data: { name: values.name, company: values.company },
+      },
+    });
+    if (error) {
+      setRegisterError(error.message);
+      return;
+    }
+    
+    // Créer automatiquement un profil dans la table profiles si l'utilisateur a été créé
+    if (data.user) {
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert({
+          id: data.user.id,
+          full_name: values.name,
+          company: values.company,
+        });
+      
+      if (profileError) {
+        // Si la création du profil échoue, on affiche un warning mais on considère que l'inscription a réussi
+        console.warn("Erreur lors de la création du profil:", profileError);
+      }
+      
+      // Enregistrer le log d'inscription
+      addLog("Inscription", `Nouveau compte créé : ${values.name} (${values.company}) - ${values.email}`);
+    }
+    
+    setRegisterSuccess("Compte créé avec succès ! Vérifie ta boîte mail pour valider ton compte.");
+    // Redirection facultative après inscription (connexion auto possible en back)
+    // setLocation("/dashboard");
   }
 
   return (
@@ -54,7 +95,12 @@ export default function Register() {
             Rejoignez des milliers d'artisans qui simplifient leur quotidien.
           </p>
         </div>
-
+        {registerError && (
+          <div className="bg-red-500/70 text-white rounded px-3 py-2">{registerError}</div>
+        )}
+        {registerSuccess && (
+          <div className="bg-green-500/70 text-white rounded px-3 py-2">{registerSuccess}</div>
+        )}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -114,7 +160,6 @@ export default function Register() {
             </Button>
           </form>
         </Form>
-
         <div className="text-center text-sm">
           <span className="text-muted-foreground">Déjà un compte ? </span>
           <Link href="/auth/login" className="font-medium text-primary hover:text-primary/80 transition-colors">
