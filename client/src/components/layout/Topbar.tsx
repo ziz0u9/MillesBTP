@@ -44,11 +44,12 @@ export function Topbar() {
           .from("profiles")
           .select("full_name, company")
           .eq("id", session.user.id)
-          .single();
+          .maybeSingle(); // Utiliser maybeSingle() au lieu de single() pour éviter l'erreur 406 si le profil n'existe pas
         
         if (!error && profileData) {
           setProfile(profileData);
         } else {
+          // Si le profil n'existe pas, utiliser les métadonnées de l'utilisateur
           setProfile(session.user.user_metadata ?? {});
         }
       } else {
@@ -186,17 +187,17 @@ export function Topbar() {
       // Recherche dans les appels
       const { data: calls } = await supabase
         .from("calls")
-        .select("id, contact, phone, subject")
+        .select("id, client_name, phone, reason")
         .eq("user_id", session.user.id)
-        .or(`contact.ilike.%${query}%,phone.ilike.%${query}%,subject.ilike.%${query}%`)
+        .or(`client_name.ilike.%${query}%,phone.ilike.%${query}%,reason.ilike.%${query}%`)
         .limit(5);
 
       calls?.forEach(call => {
         results.push({
           id: call.id,
           type: "call",
-          title: call.contact,
-          subtitle: `${call.phone} - ${call.subject || ""}`,
+          title: call.client_name,
+          subtitle: `${call.phone} - ${call.reason || ""}`,
           href: "/dashboard/calls",
           icon: Phone,
         });

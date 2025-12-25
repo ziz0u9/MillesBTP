@@ -78,12 +78,12 @@ export default function Dashboard() {
 
       const revenue = paidInvoices?.reduce((sum, inv) => sum + parseFloat(inv.amount.toString()), 0) || 0;
 
-      // Appels en attente
+      // Appels en attente (nouveau ou à rappeler)
       const { count: pendingCallsCount } = await supabase
         .from("calls")
         .select("*", { count: "exact", head: true })
         .eq("user_id", userId)
-        .in("status", ["pending"]);
+        .in("status", ["new", "to_recall"]);
 
       // Mails non lus
       const { count: unreadMailsCount } = await supabase
@@ -189,21 +189,21 @@ export default function Dashboard() {
       });
     });
 
-    // Appels manqués récents
-    const { data: missedCalls } = await supabase
+    // Appels à rappeler récents
+    const { data: callsToRecall } = await supabase
       .from("calls")
-      .select("contact, subject, created_at")
+      .select("client_name, reason, created_at")
       .eq("user_id", userId)
-      .eq("status", "missed")
+      .eq("status", "to_recall")
       .order("created_at", { ascending: false })
       .limit(1);
 
-    missedCalls?.forEach((call) => {
+    callsToRecall?.forEach((call) => {
       activities.push({
-        id: call.contact,
+        id: call.client_name,
         type: "call",
-        title: "Appel manqué",
-        desc: `${call.contact} - ${call.subject || ""}`,
+        title: "Appel à rappeler",
+        desc: `${call.client_name} - ${call.reason || ""}`,
         amount: "",
         time: format(new Date(call.created_at), "Il y a H'h'"),
         status: "danger",

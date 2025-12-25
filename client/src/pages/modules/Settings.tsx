@@ -22,7 +22,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function Settings() {
-  const { logs } = useLogs();
+  const { logs, loading: logsLoading } = useLogs();
   const { session } = useSession();
   const [profile, setProfile] = useState<any>(null);
 
@@ -33,7 +33,7 @@ export default function Settings() {
           .from("profiles")
           .select("full_name, company")
           .eq("id", session.user.id)
-          .single();
+          .maybeSingle(); // Utiliser maybeSingle() au lieu de single() pour éviter l'erreur 406 si le profil n'existe pas
         
         if (!error && profileData) {
           setProfile(profileData);
@@ -217,25 +217,31 @@ export default function Settings() {
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[500px] pr-4">
-                <div className="space-y-6">
-                  {logs.map((log) => (
-                    <div key={log.id} className="flex items-start gap-4 pb-4 border-b border-[#3a3f47] last:border-0">
-                      <div className="mt-1 flex-shrink-0">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#00ff88]/10 border border-[#00ff88]/20">
-                          <History className="h-5 w-5 text-[#00ff88]" />
+                {logsLoading ? (
+                  <div className="text-center py-8 text-gray-400">Chargement des logs...</div>
+                ) : logs.length === 0 ? (
+                  <div className="text-center py-8 text-gray-400">Aucun log disponible</div>
+                ) : (
+                  <div className="space-y-6">
+                    {logs.map((log) => (
+                      <div key={log.id} className="flex items-start gap-4 pb-4 border-b border-[#3a3f47] last:border-0">
+                        <div className="mt-1 flex-shrink-0">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#00ff88]/10 border border-[#00ff88]/20">
+                            <History className="h-5 w-5 text-[#00ff88]" />
+                          </div>
+                        </div>
+                        <div className="flex-1 space-y-1">
+                          <div className="flex items-center justify-between">
+                            <p className="font-semibold text-sm text-white">{log.action}</p>
+                            <span className="text-xs text-gray-400">{log.date}</span>
+                          </div>
+                          <p className="text-sm text-gray-300">{log.detail}</p>
+                          <p className="text-xs font-mono text-gray-500">IP: {log.ip}</p>
                         </div>
                       </div>
-                      <div className="flex-1 space-y-1">
-                        <div className="flex items-center justify-between">
-                          <p className="font-semibold text-sm text-white">{log.action}</p>
-                          <span className="text-xs text-gray-400">{log.date}</span>
-                        </div>
-                        <p className="text-sm text-gray-300">{log.detail}</p>
-                        <p className="text-xs font-mono text-gray-500">IP: {log.ip}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </ScrollArea>
             </CardContent>
           </Card>
