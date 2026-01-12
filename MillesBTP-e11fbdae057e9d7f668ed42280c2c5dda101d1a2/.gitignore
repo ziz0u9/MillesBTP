@@ -1,0 +1,16 @@
+node_modules
+dist
+.DS_Store
+server/public
+vite.config.ts.*
+*.tar.gz
+.local/
+
+# Fichiers sensibles - tokens et clés API
+*token*.txt
+*Token*.txt
+fimbi/
+stb/
+*.key
+*.env.local
+.env

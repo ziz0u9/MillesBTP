@@ -1,0 +1,107 @@
+=== CORRECTIONS APPLIQUÉES - Problème de Chargement des Chantiers ===
+Date: 02/01/2026
+Problème rapporté: Les chantiers ont souvent du mal à charger, page vide nécessitant un rechargement
+
+=== DIAGNOSTIC ===
+
+Causes identifiées:
+1. Configuration React Query contradictoire (refetch désactivé globalement)
+2. Pas de retry en cas d'échec de requête
+3. Race condition entre session et requêtes
+4. Manque de logs pour déboguer
+5. Pas d'affichage d'erreur pour l'utilisateur
+
+=== CORRECTIONS APPLIQUÉES ===
+
+1. ✅ client/src/lib/queryClient.ts
+   - Activé refetchOnWindowFocus: true
+   - Ajouté retry: 2 avec délai exponentiel
+   - Configuré staleTime: 30s et gcTime: 5min
+   - Meilleur équilibre entre performance et fraîcheur des données
+
+2. ✅ client/src/pages/modules/Chantiers.tsx
+   - Ajouté retry: 3 spécifique pour les chantiers
+   - Logs détaillés à chaque étape ([Chantiers] prefix)
+   - Affichage d'erreur avec bouton "Réessayer"
+   - Indicateur de rechargement en arrière-plan
+   - Gestion d'erreur robuste avec messages clairs
+
+3. ✅ client/src/pages/dashboard/Dashboard.tsx
+   - Ajouté retry: 3 pour le dashboard
+   - Logs détaillés ([Dashboard] prefix)
+   - Meilleure gestion des erreurs Supabase
+   - Vérification des erreurs pour chaque requête parallèle
+
+4. ✅ client/src/App.tsx
+   - Synchronisation session/cache
+   - Invalidation automatique du cache quand la session change
+   - Logs pour tracer les changements de session
+
+=== AMÉLIORATIONS UX ===
+
+1. Indicateur de chargement initial
+   - Message "Chargement des chantiers..." pendant le premier chargement
+
+2. Indicateur de rechargement en arrière-plan
+   - Badge bleu discret en haut à droite: "Actualisation..."
+   - Permet de voir les données en cache pendant le rechargement
+
+3. Affichage d'erreur clair
+   - Fond rouge avec bordure
+   - Message d'erreur détaillé
+   - Bouton "Réessayer" pour relancer manuellement
+
+4. Retry automatique
+   - 3 tentatives automatiques avec délai exponentiel (1s, 2s, 5s)
+   - Logs de chaque tentative dans la console
+
+=== LOGS DE DÉBOGAGE ===
+
+Nouveaux logs disponibles dans la console (F12):
+- [App] Session utilisateur détectée, invalidation du cache
+- [Chantiers] Début du chargement des chantiers...
+- [Chantiers] Chargement pour userId: xxx
+- [Chantiers] X chantier(s) chargé(s) avec succès
+- [Chantiers] Nouvelle tentative X dans Yms (en cas d'échec)
+- [Dashboard] Début du chargement des données...
+- [Dashboard] Chargé: X chantiers, Y décisions, Z avenants
+
+=== COMPORTEMENT ATTENDU ===
+
+✅ Chargement fiable au premier affichage
+✅ Retry automatique en cas d'erreur temporaire
+✅ Affichage clair des erreurs persistantes
+✅ Rechargement automatique quand on revient sur la page
+✅ Cache intelligent pour éviter les rechargements inutiles
+✅ Logs détaillés pour diagnostiquer les problèmes
+
+=== TESTS RECOMMANDÉS ===
+
+1. Test normal: Accéder à /dashboard/chantiers
+   → Devrait charger immédiatement
+
+2. Test de cache: Naviguer entre les pages
+   → Les données en cache s'affichent instantanément
+
+3. Test de focus: Quitter l'onglet puis revenir
+   → Rechargement automatique après 30s
+
+4. Test de session: Se déconnecter puis se reconnecter
+   → Cache invalidé, nouvelles données chargées
+
+5. Test d'erreur: Simuler une erreur réseau
+   → 3 tentatives automatiques, puis affichage d'erreur avec bouton
+
+=== FICHIERS MODIFIÉS ===
+
+- client/src/lib/queryClient.ts (configuration globale)
+- client/src/pages/modules/Chantiers.tsx (page des chantiers)
+- client/src/pages/dashboard/Dashboard.tsx (tableau de bord)
+- client/src/App.tsx (synchronisation session)
+
+=== DOCUMENTATION ===
+
+Voir AMELIORATIONS_CHARGEMENT_CHANTIERS.md pour plus de détails techniques.
+
+=== FIN DES CORRECTIONS ===
+
