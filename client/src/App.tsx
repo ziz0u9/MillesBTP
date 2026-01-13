@@ -23,18 +23,15 @@ function RouterGuard() {
   const { session, loading } = useSession();
   const [location, setLocation] = useLocation();
 
-  // Protéger toutes les routes /dashboard si non authentifié
-  // Et rediriger les utilisateurs connectés qui tentent d'accéder à login/register
+  // MODE DÉMO : Rediriger automatiquement vers le dashboard
   useEffect(() => {
     if (!loading) {
-      if (!session && location.startsWith("/dashboard")) {
-        setLocation("/auth/login");
-      } else if (session && (location === "/auth/login" || location === "/auth/register")) {
-        // Si l'utilisateur est déjà connecté, rediriger vers le dashboard
+      // Rediriger la page d'accueil et les pages d'auth vers le dashboard
+      if (location === "/" || location === "/auth/login" || location === "/auth/register") {
         setLocation("/dashboard");
       }
     }
-  }, [location, session, loading, setLocation]);
+  }, [location, loading, setLocation]);
 
   // Recharger les données quand la session change
   useEffect(() => {
@@ -93,11 +90,14 @@ function RouterGuard() {
 
   return (
     <Switch>
-      {/* Public Routes */}
-      <Route path="/" component={LandingPage} />
-      <Route path="/auth/login" component={Login} />
-      <Route path="/auth/register" component={Register} />
-      {/* Dashboard Routes protégées */}
+      {/* Mode Démo : Redirection automatique vers dashboard */}
+      <Route path="/">
+        {() => {
+          setLocation("/dashboard");
+          return null;
+        }}
+      </Route>
+      {/* Dashboard Routes - Accès direct sans authentification */}
       <Route path="/dashboard">
         <Layout>
           <Dashboard />
