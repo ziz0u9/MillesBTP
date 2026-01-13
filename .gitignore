@@ -1,0 +1,46 @@
+# Dépendances et build
+node_modules
+dist
+.DS_Store
+server/public
+vite.config.ts.*
+
+# Archives
+*.tar.gz
+*.zip
+
+# Local
+.local/
+
+# Fichiers de configuration IDE/Éditeur
+*.code-workspace
+.vscode/
+.idea/
+
+# Projets dupliqués dans le même dossier
+MillesBTP/
+MillesBTP-1/
+MillesBTP-2/
+millesbtp-web/
+
+# Fichiers texte de notes/tokens (sauf README)
+*.txt
+!README.txt
+
+# Fichiers sensibles - tokens et clés API
+*token*.txt
+*Token*.txt
+fimbi/
+stb/
+*.key
+*.env.local
+.env
+
+# Logs
+*.log
+npm-debug.log*
+npm-dev*.log
+
+# Vercel
+.vercel
+.vercelrc
